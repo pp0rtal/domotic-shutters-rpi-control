@@ -1,0 +1,38 @@
+{
+  "name": "domotic-shutters-rpi-control",
+  "version": "1.0.0",
+  "description": "Web server interface to control shutters for you home",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "ava test",
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patateviolente/domotic-shutters-rpi-control.git"
+  },
+  "keywords": [
+    "jarolift",
+    "shutters",
+    "raspberry",
+    "gpio",
+    "interface",
+    "controller"
+  ],
+  "author": "Patrick Portal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/patateviolente/domotic-shutters-rpi-control/issues"
+  },
+  "homepage": "https://github.com/patateviolente/domotic-shutters-rpi-control#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "rpi-gpio": "^0.9.1"
+  },
+  "dev-dependencies": {
+    "ava": "^0.25.0"
+  }
+}
