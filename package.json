@@ -29,7 +29,9 @@
   },
   "homepage": "https://github.com/patateviolente/domotic-shutters-rpi-control#readme",
   "dependencies": {
+    "bluebird": "^3.5.1",
     "express": "^4.16.2",
+    "log4js": "^2.5.3",
     "rpi-gpio": "^0.9.1"
   },
   "dev-dependencies": {
