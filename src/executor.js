@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const logger = require('log4js').getLogger();
-const gpio = Promise.promisifyAll(require('rpi-gpio'));
+const GPIO = Promise.promisifyAll(require('rpi-gpio'));
 
 const config = require('../config');
 const Moves = require('./moves');
@@ -12,7 +12,7 @@ const Moves = require('./moves');
  */
 function executeInstructionsSequence(instructions) {
   return Promise.each(instructions, (instruction) => {
-    const isRadioButton = instruction !== Moves.DEC && instruction !== Moves.DEC;
+    const isRadioButton = instruction !== Moves.NEXT && instruction !== Moves.PREV;
     const pressDuration = isRadioButton ? config.timing.durationRadioButton : config.timing.durationSelectButton;
 
     return triggerGPIO(instruction, pressDuration)
@@ -28,18 +28,17 @@ function executeInstructionsSequence(instructions) {
 function triggerGPIO(mode, delay) {
   const pin = retrievePin(mode);
 
-  if (config.gpio.simulate) {
+  if (config.server.simulate) {
     const instruction = retrieveInstruction(mode);
 
-    return Promise.try(() => logger.debug('', `pin ${pin} (${instruction}) up`))
+    return Promise.try(() => logger.debug('', `pin ${pin} (${instruction}) up (${delay}ms)`))
       .then(() => Promise.delay(delay))
-      .then(() => logger.debug('', `pin ${pin} (${instruction}) down`))
       .then(() => Promise.delay(config.timing.sleepDuration));
   }
 
-  return gpio.writeAsync(pin, true)
+  return GPIO.writeAsync(pin, true)
     .then(() => Promise.delay(delay))
-    .then(() => gpio.writeAsync(pin, false))
+    .then(() => GPIO.writeAsync(pin, false))
     .then(() => Promise.delay(config.timing.sleepDuration))
     .catch(e => {
       throw new Error(`GPIO error: ${e.message}`)
@@ -51,30 +50,32 @@ function triggerGPIO(mode, delay) {
  * @return {number} Pin
  */
 function retrievePin(move) {
-  switch (move) {
-    case Moves.PREV:
-      return config.gpio.prev;
-    case Moves.NEXT:
-      return config.gpio.next;
-    case Moves.OPEN:
-      return config.gpio.open;
-    case Moves.STOP:
-      return config.gpio.stop;
-    case Moves.CLOSE:
-      return config.gpio.close;
+  const key = Object.keys(Moves).reduce((res, key) =>
+    res || (move === Moves[key] && key), false);
+
+  if (key && config.gpio[key.toLowerCase()]) {
+    return config.gpio[key.toLowerCase()]
   }
   throw new Error(`Can not find pin for move=${move}`);
 }
 
 /** @return {Promise<void>} setup required pins */
 function initGPIO() {
-  return Promise.all(Object.keys(config.gpio).forEach(gpioName =>
-    gpio.setupAsync(config.gpio[gpioName], gpio.DIR_OUT)));
+  if (config.server.simulate) {
+    return Promise.resolve();
+  }
+
+  return Promise.all(Object.keys(config.gpio).map(gpioName =>
+    GPIO.setupAsync(config.gpio[gpioName], GPIO.DIR_OUT)));
 }
 
 /** @return {Promise<void>} clear all pins */
 function closeGPIO() {
-  return gpio.destroyAsync();
+  if (config.server.simulate) {
+    return Promise.delay();
+  }
+
+  return GPIO.destroyAsync();
 }
 
 /**

@@ -2,7 +2,8 @@ const config = require('../config');
 
 let currentChannel = 0;
 const controller = {
-  getMoveInstructions,
+  getMovesInstructions,
+  SELECT: [],
   NEXT: 1,
   PREV: -1,
   OPEN: 2,
@@ -11,17 +12,24 @@ const controller = {
 };
 
 module.exports = controller;
+module.exports.getChannel = getChannel;
 
 /**
  * @param {int[]} channels An array of all channel to open / close / stop
  * @param {String} move 'open' / 'close' / 'stop'
  * @return {int[]} An array of all instructions to execute
  */
-function getMoveInstructions(channels, move) {
-  return channels.reduce((result, chan) => result.concat(
-    getPointerMovesToChannel(chan - 1),
-    controller[move.toUpperCase()]
-  ), []);
+function getMovesInstructions(channels, move = 'select') {
+  const channel = currentChannel;
+  try {
+    return channels.reduce((result, chan) => result.concat(
+      getPointerMovesToChannel(chan - 1),
+      controller[move.toUpperCase()]
+    ), []);
+  } catch (e) {
+    currentChannel = channel;
+    throw e;
+  }
 }
 
 /**
@@ -50,4 +58,11 @@ function getPointerMovesToChannel(toChan) {
   return (config.controller.allowDec && countDec < countInc)
     ? Array(countDec).fill(controller.PREV)
     : Array(countInc).fill(controller.NEXT);
+}
+
+/**
+ * @return {number} Calculated channel after all actions
+ */
+function getChannel() {
+  return currentChannel;
 }

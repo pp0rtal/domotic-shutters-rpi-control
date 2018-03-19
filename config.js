@@ -1,10 +1,11 @@
 module.exports = {
   server: {
-    port: 8086
+    port: 8086,
+    simulate: false,
+    idle: 15 // Seconds before reset on channel 1, false to disable
   },
   // Set input
   gpio: {
-    simulate: true, // For dev not a pi
     prev: 19,
     next: 26,
     open: 16,
@@ -18,7 +19,7 @@ module.exports = {
   // Time a button is pressed, sleep between each call
   timing: {
     durationSelectButton: 50,
-    durationRadioButton: 200,
-    sleepDuration: 100
+    durationRadioButton: 300,
+    sleepDuration: 20
   }
 };

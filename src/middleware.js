@@ -1,14 +1,19 @@
-const Promise = require('bluebird');
 const logger = require('log4js').getLogger();
 
-const moves = require('./moves');
-const executor = require('./executor');
+const master = require('./master');
 
-const stack = [];
+// For logs
+const loggerLangHelper = {
+  open: 'opening',
+  close: 'closing',
+  stop: 'stopped',
+  select: 'selected',
+};
 
 /**
  * @param req
  * @param {*} req.params
+ * @param {String} req.originalUrl Raw URL
  * @param {String} req.params.selection selected channels ('1,2,3')
  * @param {String} req.params.instruction open / close / stop
  * @param res
@@ -20,42 +25,26 @@ module.exports = function(req, res, next) {
   const instruction = req.params.instruction;
 
   // Direct instruction
-  if (['open', 'close', 'stop'].includes(instruction)) {
-    return Promise.try(() => {
-      const move = moves.getMoveInstructions(ids, instruction);
-      logger.log('', `${req.originalUrl} - ${instruction} on ${ids} (${move})`);
-
-      return move;
-    })
-      .then(move => planifyInstructions(move))
+  if (['open', 'close', 'stop', 'select'].includes(instruction)) {
+    return master.moveMasterSequence(req.originalUrl, ids, instruction)
       .then(() => res.end())
-      .then(() => logger.log('', `${ids} is ${instruction}`))
+      .then(() => logger.log('', `${ids} ${ids.length > 1 ? "are" : 'is'} ${loggerLangHelper[instruction]}`))
       .catch((e) => {
         res.status = 500;
         res.end(e.toString());
         logger.error('', e.message);
-        throw e;
       });
   }
 
+  // Partial
   const partialMove = parsePartialMove(instruction);
   if (partialMove) {
-    console.log(`TODO move ${partialMove}`);
+    logger.warning(`TODO partial move ${partialMove}`);
   }
 
   return next();
 };
 
-/**
- *
- * @param move
- * @return {Promise<void>}
- */
-function planifyInstructions(move) {
-  const job = () => executor.executeInstructionsSequence(move);
-
-  return job();
-}
 
 /**
  * @param str Valid integer between [-100;100]
@@ -76,6 +65,7 @@ function parsePartialMove(str) {
  */
 function getSelection(str) {
   str = str.replace(/[,;\+]+/, ',');
+  str = str.replace(/[^\d,]/g, '');
 
-  return str.split(',');
+  return str.split(',').sort();
 }
