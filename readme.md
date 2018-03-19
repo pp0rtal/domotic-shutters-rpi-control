@@ -1,58 +1,62 @@
 # Pi remote shutter controller interface
-Hack your home shutter controller, compatible for Raspberry GPIO outputs.
-This program will run a web server enabling you to control hom shutter like remove controller.
+Hack for your home shutter remote control, compatible with **Raspberry GPIOs** outputs.
+This program will **run a web server** enabling to interface the remote with any domotic environment.
 
-Some manufacturers does not allow you to control you shutters via your own RF antenna and your computer.
-If you are totally stuck when pairing your remote control because of an unkown hardware encryption, 
-you may be interested to exploit hardware buttons and transform your remote into a new web interface.
+***Why this project?** Some manufacturers does not allow you to control you shutters using 
+your own RF antenna and your computer usign hardware encryption when pairing.
+You may be interested to exploit hardware buttons and control buttons using an easy web interface.*
 
 Here is an example of pi remote:
 
 ![breadbord](./docs/breadbord.jpg)
 
 
-### How to run
+## Select and `open` / `close` / `stop` shutters
+Use those function using the following url
+
+To open rolling shutter on channel 1 *(set 1 if you've only one channel)*:
+```curl
+http://localhost:8086/1/open
+```
+
+To stop the shutter on **channel 1 and 2**:
+```curl
+http://localhost:8086/1,2/stop
+```
+
+To **close half way** all your shutters above 4:
+```curl
+http://localhost:8086/1,2,3,4/-50
+```
+
+To **open a little bit more** (10%) your shutter 1 
+```curl
+http://localhost:8086/1/+10
+```
+
+
+### Set up
 
 - [x] Install `nodejs` and `npm` on your Raspberry.
-- [x] Edit JSON configuration in `config.js` for your controller
+- [x] Clone project and edit the JSON configuration `config.js` to match your controller
 - [x] Run this program as a cron, you must give root privileges for GPIO control
 
 
 ```bash
 # In project folder
 npm install
-npm start
+node ./index # works with absolute paths
 ```
 
-To set this program as a daemon you have to start it as a service, 
+You have to run this program **on system start up**,
 you can use `supervisord` for this or create an `/etc/init.d/` daemon.
 
-
-## Open / close / stop one or several shutter
-Use those function using the following url
-
-To open rolling shutter on channel 1:
-```curl
-http://localhost:8086/1/open
+Here is my supervisord configuration for that `/etc/supervisor/conf.d/shutters.conf`:
 ```
-
-To stop the shutter on channel 1 and 2:
-```curl
-http://localhost:8086/1,2/stop
+[program:rediscommander]
+command=node /path/to/project/index.js
+autostart=true
 ```
-
-To close half way all your shutters above 4:
-```curl
-http://localhost:8086/1,2,3,4/-50
-```
-
-To open a little bit more (10%) your shutter 1 
-```curl
-http://localhost:8086/1/+10
-```
-
-To avoid a desynchronization of the remote / PI as there are no input, 
-an idle state is triggered after a few seconds and reset to the default channel 1.
 
 
 ## Channel configuration
@@ -62,7 +66,11 @@ If you have a controller with multiple channels, it is necessary to link **at le
 
 The prev button is optional and depends of your controller, set `config.gpio.prev: false` to disable the *prev* button.
 
-Program is compatible with unique channel, just call `/1/action`
+Program is compatible with unique channel, just call `/1/stop`
+
+To avoid a desynchronization of the remote / PI as there are no input, 
+an idle state is triggered after a few seconds and reset to the default channel 1.
+
 
 
 ## Example of hacked remote controller
