@@ -65,8 +65,11 @@ function initGPIO() {
     return Promise.resolve();
   }
 
-  return Promise.all(Object.keys(config.gpio).map(gpioName =>
-    GPIO.setupAsync(config.gpio[gpioName], GPIO.DIR_OUT)));
+  return Promise.all(Object.keys(config.gpio).map(gpioName => GPIO.setupAsync(config.gpio[gpioName], GPIO.DIR_OUT)))
+    .catch((e) => {
+      logger.error('can not init GPIOs, maybe you\'re not in an appropriate environement, use `config.server.simulate: true` to develop');
+      throw e;
+    });
 }
 
 /** @return {Promise<void>} clear all pins */

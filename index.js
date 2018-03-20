@@ -1,6 +1,6 @@
 const log4js = require('log4js');
 const express = require('express');
-const executor = require('./src/executor');
+const executor = require('./src/remote');
 
 const router = require('./src/middleware');
 const master = require('./src/master');

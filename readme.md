@@ -26,12 +26,12 @@ http://localhost:8086/1,2/stop
 
 To **close half way** all your shutters above 4:
 ```curl
-http://localhost:8086/1,2,3,4/-50
+http://localhost:8086/1,2,3,4/-0.5
 ```
 
-To **open a little bit more** (10%) your shutter 1 
+To **open a little bit more** (10%) your shutter 1:
 ```curl
-http://localhost:8086/1/+10
+http://localhost:8086/1/0.1
 ```
 
 

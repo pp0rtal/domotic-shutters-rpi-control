@@ -3,30 +3,40 @@ const EventEmitter = require('events');
 const Promise = require('bluebird');
 const logger = require('log4js').getLogger();
 
-const executor = require('./executor');
+const executor = require('./remote');
 const config = require('../config');
 const moves = require('./moves');
 
 const stack = [];
 const stackEmitter = new EventEmitter();
-let idleTimeout = -1;
+let idleRemoteTimeout = -1;
 
 /**
  * @param {String} origin Will be logged
  * @param {String[]|Number[]} ids Channel to control
  * @param {String} instruction Action to do
+ * @param {number} stopDelay Stop delay
  * @return {*|Promise<T>}
  */
-function moveMasterSequence(origin, ids, instruction = 'select') {
-  clearTimeout(idleTimeout);
+function moveMasterSequence(origin, ids, instruction = 'select', stopDelay = 0) {
+  clearTimeout(idleRemoteTimeout);
+  let stopTimeout = false;
+  let move = [];
 
   return Promise.try(() => {
-    const move = moves.getMovesInstructions(ids, instruction);
-    logger.log('', `${origin} - ${instruction} on ${ids} (${move})`);
+    move = moves.getMovesInstructions(ids, instruction);
+    logger.log('', `${origin} - ${instruction} on ${ids} (${move}) ${stopDelay ? 'delay=' + stopDelay + 'ms' : ''}`);
 
     return move;
   })
-    .then(move => planifyInstructions(move))
+    .then(() => waitSteadyRemote(move))
+    .then(() => { // Push radio button
+      if (stopDelay) {
+        stopTimeout = setTimeout(() => moveMasterSequence('delay', ids, 'stop'), stopDelay);
+      }
+
+      return executor.executeInstructionsSequence(move);
+    })
     .then(() => {
       stack.shift();
       stackEmitter.emit('next');
@@ -34,7 +44,7 @@ function moveMasterSequence(origin, ids, instruction = 'select') {
       // Idle detection if channel !== 1
       if (stack.length === 0 && config.controller.channels > 1
         && moves.getChannel() && config.server.idle) {
-        idleTimeout = setTimeout(() => {
+        idleRemoteTimeout = setTimeout(() => {
           logger.log('', 'Idle - reset to channel 1');
 
           return resetToFirstChannel();
@@ -51,28 +61,25 @@ function resetToFirstChannel() {
 }
 
 /**
- * Will execute moves when remote command is available
+ * Will resolve when the remote control is available
  * @param {number[]} move Move instructions
- * @return {Promise} Resolve when all instructions are executed
+ * @return {bluebird} Resolve when all instructions are executed
  */
-function planifyInstructions(move) {
-  const job = () => executor.executeInstructionsSequence(move);
-  stack.push(job);
+function waitSteadyRemote(move) {
+  stack.push(move);
 
   // No concurrency
   if (stack.length === 1) {
-    return job();
+    return Promise.resolve(move);
   }
 
-  return new Promise((resolve, reject) => {
-    stackEmitter.on('next', () => {
-      if (stack[0] === job) {
-        return job()
-          .then(resolve)
-          .catch(reject);
-      }
-    })
-  });
+  return new Promise(resolve => stackEmitter.on('next', () => {
+    if (stack[0] === move) {
+      return resolve(move);
+    }
+
+    return null;
+  }));
 }
 
 module.exports = {
