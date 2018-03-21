@@ -9,20 +9,20 @@ module.exports = {
   gpio: {
     prev: 19,
     next: 26,
-    open: 16,
+    open: 21,
     stop: 20,
-    close: 21
+    close: 16
   },
   controller: {
     channels: 8,
     allowPrev: true,
-    allowNext: true
+    allowNext: false
   },
   // Press button duration
   timing: {
-    durationSelectButton: 100,
-    durationRadioButton: 500,
-    sleepDuration: 50,
+    durationSelectButton: 60,
+    durationRadioButton: 600,
+    sleepDuration: 30,
     // Average open / close duration of your shutters
     realtime: {
       open: 27000,

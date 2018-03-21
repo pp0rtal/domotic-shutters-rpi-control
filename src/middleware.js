@@ -20,7 +20,7 @@ const loggerLangHelper = {
  * @param res
  * @return {*}
  */
-module.exports = function(req, res) {
+module.exports = function (req, res) {
   const ids = getSelection(req.params.selection);
   let instruction = req.params.instruction;
   let stopDelay = 0;
@@ -67,5 +67,5 @@ function getSelection(str) {
   str = str.replace(/[,;\+]+/, ',');
   str = str.replace(/[^\d,]/g, '');
 
-  return str.split(',').sort();
+  return str.split(',').sort((a, b) => config.controller.allowNext ? a - b : b - a);
 }
