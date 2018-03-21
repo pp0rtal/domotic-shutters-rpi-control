@@ -36,7 +36,7 @@ function moveMasterSequence(origin, ids, instruction = 'select', stopDelay = 0) 
       stackEmitter.emit('next');
 
       // Trigger delay from now
-      if (stopDelay) {
+      if (stopDelay > 500) {
         stopTimeout = setTimeout(() => moveMasterSequence('delay', ids, 'stop'), stopDelay);
       }
 

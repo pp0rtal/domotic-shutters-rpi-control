@@ -11,7 +11,7 @@ module.exports = {
     next: 26,
     open: 16,
     stop: 20,
-    close: 21,
+    close: 21
   },
   controller: {
     channels: 8,
@@ -19,13 +19,13 @@ module.exports = {
   },
   // Press button duration
   timing: {
-    durationSelectButton: 50,
-    durationRadioButton: 300,
-    sleepDuration: 20,
+    durationSelectButton: 100,
+    durationRadioButton: 500,
+    sleepDuration: 50,
     // Average open / close duration of your shutters
     realtime: {
-      open: 20000,
-      close: 18000,
+      open: 27000,
+      close: 27000,
       stop: 500
     }
   }
