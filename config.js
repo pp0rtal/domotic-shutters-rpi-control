@@ -15,7 +15,8 @@ module.exports = {
   },
   controller: {
     channels: 8,
-    allowDec: true // Allow research of channel to the "left", to the "right"
+    allowPrev: true,
+    allowNext: true
   },
   // Press button duration
   timing: {

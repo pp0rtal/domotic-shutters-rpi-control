@@ -55,7 +55,7 @@ function getPointerMovesToChannel(toChan) {
   currentChannel = toChan;
 
   // Fill instructions with shortest move
-  return (config.controller.allowDec && countDec < countInc)
+  return (!config.controller.allowNext || config.controller.allowPrev && countDec < countInc)
     ? Array(countDec).fill(controller.PREV)
     : Array(countInc).fill(controller.NEXT);
 }
