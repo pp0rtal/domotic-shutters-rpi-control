@@ -1,10 +1,10 @@
 # Pi remote shutter controller interface
 Hack for your home shutter remote control, compatible with **Raspberry GPIOs** outputs.
-This program will **run a web server** enabling to interface the remote with any domotic environment.
+This program will **run a web server** enabling to interface the remote with your domotic environment.
 
 ***Why this project?** Some manufacturers does not allow you to control you shutters using 
-your own RF antenna and your computer usign hardware encryption when pairing.
-You may be interested to exploit hardware buttons and control buttons using an easy web interface.*
+your own RF antenna, they user an hardware encryption when pairing.
+You don't give up and want to link your remote controller with your Raspberry ;)*
 
 Here is an example of pi remote:
 
@@ -39,7 +39,7 @@ http://localhost:8086/1/0.1
 
 - [x] Install `nodejs` and `npm` on your Raspberry.
 - [x] Clone project and edit the JSON configuration `config.js` to match your controller
-- [x] Run this program as a cron, you must give root privileges for GPIO control
+- [x] Run this program as a cron
 
 
 ```bash
@@ -53,7 +53,7 @@ you can use `supervisord` for this or create an `/etc/init.d/` daemon.
 
 Here is my supervisord configuration for that `/etc/supervisor/conf.d/shutters.conf`:
 ```
-[program:rediscommander]
+[program:shutters]
 command=node /path/to/project/index.js
 autostart=true
 ```
@@ -79,6 +79,22 @@ for which I solded wires and connected them to an easy breadboard.
 
 Every buttons need two wires, and are connected to an **optocoupler**.
 The optocoupler is linked from the GPIO to the ground of the Raspberry.
+You can use also transistors with adequate resistors, but an optocoupler don't need any thinking as 
+the remote voltage and intensity is really low.
+
+
+```
+                    GND      PI-GPIO
+                   +-[x]---[x]-+
+                   |  ┃     ┃  |
+                   |  ┗━|◀|━┛  |
+                   |     🡗🡗    |
+                   |    ____   |
+                   |   🡗    \  |
+                   +-[x]---[x]-+
+                    remote button
+```
+
 
 ![assembly](./docs/assembly.jpg)
 

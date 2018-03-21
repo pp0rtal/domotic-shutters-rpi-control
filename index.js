@@ -26,6 +26,7 @@ process.on('SIGINT', function() {
 });
 
 // Init GPIOs
+logger.info('', `init GPIOs`);
 executor.initGPIO()
   .then(() => {
     // Handles open/close/stop instruction on selection
@@ -39,6 +40,6 @@ executor.initGPIO()
 
     // Launch server
     app.listen(config.server.port, () => {
-      console.log(`server listening on ${config.server.port}`);
+      logger.log('', `server listening on ${config.server.port}`);
     });
   });

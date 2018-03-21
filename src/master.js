@@ -30,16 +30,15 @@ function moveMasterSequence(origin, ids, instruction = 'select', stopDelay = 0) 
     return move;
   })
     .then(() => waitSteadyRemote(move))
-    .then(() => { // Push radio button
-      if (stopDelay) {
-        stopTimeout = setTimeout(() => moveMasterSequence('delay', ids, 'stop'), stopDelay);
-      }
-
-      return executor.executeInstructionsSequence(move);
-    })
+    .then(() => executor.executeInstructionsSequence(move))
     .then(() => {
       stack.shift();
       stackEmitter.emit('next');
+
+      // Trigger delay from now
+      if (stopDelay) {
+        stopTimeout = setTimeout(() => moveMasterSequence('delay', ids, 'stop'), stopDelay);
+      }
 
       // Idle detection if channel !== 1
       if (stack.length === 0 && config.controller.channels > 1

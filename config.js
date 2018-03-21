@@ -2,6 +2,7 @@ module.exports = {
   server: {
     port: 8086,
     simulate: false,
+    gpioBCM: true, // true to user GPIO num, or false to user PI pins number
     idle: 30 // Seconds before reset on channel 1, false to disable
   },
   // Set input

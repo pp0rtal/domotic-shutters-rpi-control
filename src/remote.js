@@ -5,6 +5,10 @@ const GPIO = Promise.promisifyAll(require('rpi-gpio'));
 const config = require('../config');
 const Moves = require('./moves');
 
+GPIO.setMode(config.server.gpioBCM
+  ? GPIO.MODE_BCM
+  : GPIO.MODE_RPI);
+
 /**
  * Call all buttons in the defined array, sleep between each button call.
  * @param {number[]} instructions Array of moves to do (Move constants)
@@ -65,9 +69,10 @@ function initGPIO() {
     return Promise.resolve();
   }
 
-  return Promise.all(Object.keys(config.gpio).map(gpioName => GPIO.setupAsync(config.gpio[gpioName], GPIO.DIR_OUT)))
+  return Promise.all(Object.keys(config.gpio)
+    .map(gpioName => GPIO.setupAsync(config.gpio[gpioName], GPIO.DIR_OUT)))
     .catch((e) => {
-      logger.error('can not init GPIOs, maybe you\'re not in an appropriate environement, use `config.server.simulate: true` to develop');
+      logger.error('can not init GPIOs, maybe you\'re not in an appropriate environment, use `config.server.simulate: true` to develop');
       throw e;
     });
 }
@@ -75,7 +80,7 @@ function initGPIO() {
 /** @return {Promise<void>} clear all pins */
 function closeGPIO() {
   if (config.server.simulate) {
-    return Promise.delay();
+    return Promise.resolve();
   }
 
   return GPIO.destroyAsync();
