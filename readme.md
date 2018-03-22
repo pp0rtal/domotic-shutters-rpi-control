@@ -11,7 +11,7 @@ Here is an example of pi remote:
 ![breadbord](./docs/breadbord.jpg)
 
 
-## Select and `open` / `close` / `stop` shutters
+## Examples: `open` / `close` / `stop` shutters
 Use those function using the following url
 
 To open rolling shutter on channel 1 *(set 1 if you've only one channel)*:
@@ -29,17 +29,22 @@ To **close half way** all your shutters above 4:
 http://localhost:8086/1,2,3,4/-0.5
 ```
 
-To **open a little bit more** (10%) your shutter 1:
+To **open a little bit more** (20%) your shutter 1:
 ```curl
-http://localhost:8086/1/0.1
+http://localhost:8086/1/0.2
+```
+
+Select channel 4 *(for test purpose)*
+```curl
+http://localhost:8086/4/select
 ```
 
 
-### Set up
+## Set up
 
-- [x] Install `nodejs` and `npm` on your Raspberry.
-- [x] Clone project and edit the JSON configuration `config.js` to match your controller
-- [x] Run this program as a cron
+- [ ] Install `nodejs` and `npm` on your Raspberry.
+- [ ] Clone project and edit the JSON configuration `config.js` to match your controller
+- [ ] Run this program as a cron
 
 
 ```bash
@@ -57,6 +62,22 @@ Here is my supervisord configuration for that `/etc/supervisor/conf.d/shutters.c
 command=node /path/to/project/index.js
 autostart=true
 ```
+
+
+### More infos
+
+## What's included
+
+Main options:
+- [x] Control `open`/`stop`/`close` buttons + `next`/`prev` channels
+- [x] Partial shutter opening in percent *(relatively to its current state)*
+- [x] **Idle timeout** to reset controller to first channel
+- [x] Allow channel selection by inc/dec or both, choose the shortest
+- [x] Listen only `localhost` (in config)
+
+If you need more features, you're the welcome to open an issue or a PR `;-)`
+
+Could be great to add a timer for instance, but it's maybe the job of your domotic environment then.
 
 
 ## Channel configuration
@@ -84,15 +105,18 @@ the remote voltage and intensity is really low.
 
 
 ```
-                    GND      PI-GPIO
-                   +-[x]---[x]-+
-                   |  ┃     ┃  |
-                   |  ┗━|◀|━┛  |
-                   |     🡗🡗    |
-                   |    ____   |
-                   |   🡗    \  |
-                   +-[x]---[x]-+
-                    remote button
+      (logical interface)
+
+          GND   GPIO
+         +[x]---[x]+
+         | ┃     ┃o|
+         | ┗━|◀|━┛ |
+         |    🡗🡗   |
+         |  🡗    \ |
+         +[x]---[x]+
+        remote button
+
+      (switch behavior)
 ```
 
 

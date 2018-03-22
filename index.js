@@ -39,7 +39,7 @@ executor.initGPIO()
     });
 
     // Launch server
-    app.listen(config.server.port, () => {
+    app.listen(config.server.port, config.server.hostname, () => {
       logger.log('', `server listening on ${config.server.port}`);
     });
   });
