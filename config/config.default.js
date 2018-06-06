@@ -1,8 +1,9 @@
+// Don't edit this file directly, override what you need in config/config.js
 module.exports = {
   server: {
     port: 8086,
     hostname: 'localhost', // Set false to allow any IP
-    simulate: false, // For dev purpose if your env crashes
+    simulate: true, // For dev purpose if your env crashes
     gpioBCM: true, // true to user GPIO num, or false to user PI pins number
     idle: 30 // Seconds before reset on channel 1, false to disable
   },
@@ -15,19 +16,19 @@ module.exports = {
     close: 16
   },
   controller: {
-    channels: 8,
+    channels: 4,
     allowPrev: true,
-    allowNext: false
+    allowNext: true
   },
   // Press button duration
   timing: {
-    durationSelectButton: 60,
-    durationRadioButton: 600,
-    sleepDuration: 30,
+    durationSelectButton: 100,
+    durationRadioButton: 500,
+    sleepDuration: 50,
     // Average open / close duration of your shutters
     realtime: {
-      open: 27000,
-      close: 27000,
+      open: 30000,
+      close: 30000,
       stop: 500
     }
   }

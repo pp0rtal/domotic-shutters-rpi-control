@@ -25,6 +25,10 @@ process.on('SIGINT', function() {
     .then(() => process.exit());
 });
 
+if(config.server.simulate){
+  logger.error('', 'Simulation mode, if you are on a real PI, set your config/config.js with main.simulate to false');
+}
+
 // Init GPIOs
 logger.info('', `init GPIOs`);
 executor.initGPIO()

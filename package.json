@@ -31,6 +31,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "express": "^4.16.2",
+    "lodash": "^4.17.10",
     "log4js": "^2.5.3",
     "rpi-gpio": "^0.9.1"
   },
