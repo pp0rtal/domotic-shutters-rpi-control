@@ -22,7 +22,7 @@ process.on('SIGINT', function() {
   return master.resetToFirstChannel()
     .then(() => logger.log('', 'clear GPIOs'))
     .then(() => executor.closeGPIO())
-    .then(() => process.exit());
+    .then(() => process.exit(0));
 });
 
 if(config.server.simulate){

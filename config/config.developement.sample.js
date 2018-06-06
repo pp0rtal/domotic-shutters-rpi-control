@@ -3,13 +3,16 @@ module.exports = {
     port: 8086,
     simulate: true
   },
+  controller: {
+    channels: 16
+  },
   timing: {
     durationSelectButton: 200,
-    durationRadioButton: 2000,
+    durationRadioButton: 1000,
     sleepDuration: 200,
     realtime: {
-      open: 10000,
-      close: 10000,
+      open: 5000,
+      close: 5000,
       stop: 500
     }
   }

@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const EventEmitter = require('events');
 
 const Promise = require('bluebird');
@@ -30,14 +31,19 @@ function moveMasterSequence(origin, ids, instruction = 'select', stopDelay = 0) 
     return move;
   })
     .then(() => waitSteadyRemote(move))
-    .then(() => executor.executeInstructionsSequence(move))
-    .then(() => {
+    .tap((realMoves) => executor.executeInstructionsSequence(realMoves))
+    .tap((realMoves) => {
       stack.shift();
       stackEmitter.emit('next');
 
       // Trigger delay from now
-      if (stopDelay > 500) {
+      if (stopDelay >= 500) {
         stopTimeout = setTimeout(() => moveMasterSequence('delay', ids, 'stop'), stopDelay);
+      }
+
+      if (!realMoves.length) {
+        logger.warn('', `stop timeout clear (duplicate instruction for ${ids})`);
+        clearTimeout(stopTimeout);
       }
 
       // Idle detection if channel !== 1
@@ -65,6 +71,12 @@ function resetToFirstChannel() {
  * @return {bluebird} Resolve when all instructions are executed
  */
 function waitSteadyRemote(move) {
+  // Don't stack if the only instruction is the same as previously stacked
+  // For instance queue is [ [1, 2] ] ("left", "open") and you want to stack [ 2 ] ("(re-)open")
+  if (move.length === 1 && stack.length && move[0] === _.last(stack[0])) {
+    move = [];
+  }
+
   stack.push(move);
 
   // No concurrency

@@ -1,4 +1,4 @@
-const _ = require('lodash');
+const _ = require('lodash'); // Did they think when they released then ES6 Object.assign function?
 const defaultConfig = require('./config.default');
 
 try {
