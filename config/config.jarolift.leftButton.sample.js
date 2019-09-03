@@ -4,11 +4,11 @@ module.exports = {
     simulate: false
   },
   gpio: {
-    prev: 19,
-    next: 26,
-    open: 21,
-    stop: 20,
-    close: 16
+    prev: 26,
+    next: 16,
+    open: 19,
+    stop: 21,
+    close: 20
   },
   controller: {
     channels: 8,
